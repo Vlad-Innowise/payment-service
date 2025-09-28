@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: 'payment-service'
+
+  profiles:
+    active: "${APPLICATION_PROFILE}"
+
+  data:
+    mongodb:
+      uri: "${MONGO_DB_URL}"

@@ -41,7 +41,7 @@ public class Payment extends BaseEntity {
 
     private LocalDateTime timestamp;
 
-    @Field("payment_amount")
+    @Field(value = "payment_amount", targetType = FieldType.DECIMAL128)
     private BigDecimal amount;
 
 }

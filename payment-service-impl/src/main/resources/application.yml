@@ -8,3 +8,4 @@ spring:
   data:
     mongodb:
       uri: "${MONGO_DB_URL}"
+      uuid-representation: 'standard'

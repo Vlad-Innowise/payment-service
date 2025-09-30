@@ -9,3 +9,14 @@ spring:
     mongodb:
       uri: "${MONGO_DB_URL}"
       uuid-representation: 'standard'
+
+logging:
+  level:
+    root: 'info'
+    by.innowise.internship.payments.feign.RandomIntClient: 'DEBUG'
+
+application:
+  feign:
+    clients:
+      random-org:
+        url: "https://www.random.org/integers/"

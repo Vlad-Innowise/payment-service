@@ -1,0 +1,41 @@
+services:
+
+  payment-service:
+    build: ./payment-service-impl
+    image: "ghcr.io/${GITHUB_INNOWISE_USERNAME}/${PAYMENT_SERVICE_GH_REPO_NAME}/${PAYMENT_SERVICE_IMAGE_NAME}"
+    environment:
+      SPRING_PROFILES_ACTIVE: "${APPLICATION_PROFILE}"
+      MONGO_DB_URL: "mongodb://payment-service-db:27017/${PAYMENT_SERVICE_DB_NAME}"
+      GITHUB_INNOWISE_USERNAME: "${GITHUB_INNOWISE_USERNAME}"
+      GITHUB_INNOWISE_TOKEN: "${GITHUB_INNOWISE_TOKEN}"
+      PAYMENT_SERVICE_GH_REPO_NAME: "${PAYMENT_SERVICE_GH_REPO_NAME}"
+      PAYMENT_SERVICE_IMAGE_NAME: "${PAYMENT_SERVICE_IMAGE_NAME}"
+      TOKEN_SECRET: "${TOKEN_SECRET}"
+      JAVA_TOOL_OPTIONS: '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5008'
+    ports:
+      - '9015:8080'
+      - '5008:5008'
+    expose:
+      - '9015' # application api
+      - '5007' # debug
+    restart: 'always'
+    depends_on:
+      - 'payment-service-db'
+
+  payment-service-db:
+    image: 'mongo:7.0.24-jammy'
+    environment:
+      MONGO_INITDB_DATABASE: "${PAYMENT_SERVICE_DB_NAME}"
+    ports:
+      - '27017:27017'
+    volumes:
+      - 'mongo-payment-service-vol:/data/db'
+    restart: 'always'
+
+volumes:
+  mongo-payment-service-vol:
+
+networks:
+  default:
+    external: true
+    name: 'innowise-net'

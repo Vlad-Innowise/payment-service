@@ -9,10 +9,14 @@ import by.innowise.internship.payments.service.PaymentProcessorService;
 import by.innowise.internship.payments.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -35,5 +39,23 @@ public class PaymentServiceImpl implements PaymentService {
         Payment saved = repository.save(toSave);
         log.info("Pre-saved entity to repository: {}", saved);
         return mapper.toDto(saved);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<PaymentResponseDto> getAllByUser(Long userId) {
+        List<Payment> allPaymentsByUser = repository.findAllByUserId(userId);
+        logFoundPaymentIds(allPaymentsByUser);
+        return allPaymentsByUser.stream()
+                                .map(mapper::toDto)
+                                .toList();
+    }
+
+    private void logFoundPaymentIds(List<Payment> allPaymentsByUser) {
+        Set<String> foundPayments = allPaymentsByUser.stream()
+                                                     .map(Payment::getId)
+                                                     .map(ObjectId::toHexString)
+                                                     .collect(Collectors.toSet());
+        log.info("Found payments with ids: {}", foundPayments);
     }
 }

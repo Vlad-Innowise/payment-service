@@ -33,11 +33,6 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentMapper mapper;
     private final PaymentProcessorService processorService;
 
-    private static LocalDateTime getLocalDateTime(PaymentPeriod paymentPeriod) {
-        return paymentPeriod.to().atTime(23, 59, 59,
-                                         999_999_999);
-    }
-
     @Transactional
     @Override
     public PaymentResponseDto create(PaymentRequestDto createDto, Long userId) {
@@ -88,7 +83,7 @@ public class PaymentServiceImpl implements PaymentService {
         validatePaymentPeriodDates(paymentPeriod);
 
         LocalDateTime periodStart = paymentPeriod.from().atStartOfDay();
-        LocalDateTime periodEnd = getLocalDateTime(paymentPeriod);
+        LocalDateTime periodEnd = paymentPeriod.to().atTime(23, 59, 59, 999_999_999);
         BigDecimal paymentsTotal =
                 repository.getTotalSumOfPaymentsInStatusForUserForDatePeriod(userId,
                                                                              PaymentStatus.SUCCEED,

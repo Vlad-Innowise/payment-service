@@ -1,7 +1,9 @@
 package by.innowise.internship.payments.controller;
 
+import by.innowise.internship.payments.model.dto.PaymentPeriod;
 import by.innowise.internship.payments.model.dto.PaymentRequestDto;
 import by.innowise.internship.payments.model.dto.PaymentResponseDto;
+import by.innowise.internship.payments.model.dto.PeriodTotalResponse;
 import by.innowise.internship.payments.model.entity.PaymentStatus;
 import by.innowise.internship.payments.service.PaymentService;
 import jakarta.validation.Valid;
@@ -67,5 +69,13 @@ public class PaymentController {
         List<PaymentResponseDto> allPaymentsByStatus = paymentService.getAllByUserAndStatus(userId, status);
         log.info("Received all payments: {} with status: {}", allPaymentsByStatus.size(), status);
         return ResponseEntity.ok(allPaymentsByStatus);
+    }
+
+    @GetMapping("/total-by-period")
+    public ResponseEntity<PeriodTotalResponse> getByUserAndStatus(@PathVariable Long userId,
+                                                                  @RequestBody @Valid PaymentPeriod paymentPeriod) {
+        log.info("Requested to calculate total payment amount for finished payment for the period from: {} to: {}",
+                 paymentPeriod.from(), paymentPeriod.to());
+        return ResponseEntity.ok(paymentService.calculatePaymentTotalForPeriod(userId, paymentPeriod));
     }
 }

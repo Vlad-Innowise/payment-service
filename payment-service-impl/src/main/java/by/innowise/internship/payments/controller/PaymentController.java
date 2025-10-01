@@ -2,6 +2,7 @@ package by.innowise.internship.payments.controller;
 
 import by.innowise.internship.payments.model.dto.PaymentRequestDto;
 import by.innowise.internship.payments.model.dto.PaymentResponseDto;
+import by.innowise.internship.payments.model.entity.PaymentStatus;
 import by.innowise.internship.payments.service.PaymentService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -55,5 +57,15 @@ public class PaymentController {
         List<PaymentResponseDto> allPayments = paymentService.getByUserAndOrder(userId, orderId);
         log.info("Got payment list for order: {} of size: {}", orderId, allPayments.size());
         return ResponseEntity.ok(allPayments);
+    }
+
+    @GetMapping("/by-status")
+    public ResponseEntity<List<PaymentResponseDto>> getByUserAndStatus(@PathVariable Long userId,
+                                                                       @RequestParam
+                                                                       PaymentStatus status) {
+        log.info("Requested to get all payments for user: {} by status: {}", userId, status);
+        List<PaymentResponseDto> allPaymentsByStatus = paymentService.getAllByUserAndStatus(userId, status);
+        log.info("Received all payments: {} with status: {}", allPaymentsByStatus.size(), status);
+        return ResponseEntity.ok(allPaymentsByStatus);
     }
 }

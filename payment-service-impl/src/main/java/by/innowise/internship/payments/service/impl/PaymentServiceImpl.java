@@ -4,6 +4,7 @@ import by.innowise.internship.payments.mapper.PaymentMapper;
 import by.innowise.internship.payments.model.dto.PaymentRequestDto;
 import by.innowise.internship.payments.model.dto.PaymentResponseDto;
 import by.innowise.internship.payments.model.entity.Payment;
+import by.innowise.internship.payments.model.entity.PaymentStatus;
 import by.innowise.internship.payments.repository.PaymentRepository;
 import by.innowise.internship.payments.service.PaymentProcessorService;
 import by.innowise.internship.payments.service.PaymentService;
@@ -56,6 +57,16 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public List<PaymentResponseDto> getByUserAndOrder(Long userId, UUID orderId) {
         List<Payment> foundPayments = repository.findAllByUserIdAndOrderId(userId, orderId);
+        logFoundPaymentIds(foundPayments);
+        return foundPayments.stream()
+                            .map(mapper::toDto)
+                            .toList();
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<PaymentResponseDto> getAllByUserAndStatus(Long userId, PaymentStatus status) {
+        List<Payment> foundPayments = repository.findAllByUserIdAndStatus(userId, status);
         logFoundPaymentIds(foundPayments);
         return foundPayments.stream()
                             .map(mapper::toDto)

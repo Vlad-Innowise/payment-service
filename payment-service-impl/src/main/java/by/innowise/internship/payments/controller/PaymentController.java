@@ -4,6 +4,7 @@ import by.innowise.internship.payments.model.dto.PaymentRequestDto;
 import by.innowise.internship.payments.model.dto.PaymentResponseDto;
 import by.innowise.internship.payments.service.PaymentService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/payments/user/{userId}")
@@ -40,6 +42,18 @@ public class PaymentController {
         log.info("Requested to get all payments for user: {}", userId);
         List<PaymentResponseDto> allPayments = paymentService.getAllByUser(userId);
         log.info("Got payment list of size: {}", allPayments.size());
+        return ResponseEntity.ok(allPayments);
+    }
+
+    @GetMapping("/by-order/{orderId}")
+    public ResponseEntity<List<PaymentResponseDto>> getByUserAndOrder(@PathVariable
+                                                                      Long userId,
+                                                                      @PathVariable
+                                                                      @NotNull(message = "Order id can't be null")
+                                                                      UUID orderId) {
+        log.info("Requested to get all payments for order: {}, user: {}", orderId, userId);
+        List<PaymentResponseDto> allPayments = paymentService.getByUserAndOrder(userId, orderId);
+        log.info("Got payment list for order: {} of size: {}", orderId, allPayments.size());
         return ResponseEntity.ok(allPayments);
     }
 }

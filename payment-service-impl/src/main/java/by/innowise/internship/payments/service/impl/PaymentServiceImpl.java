@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,6 +50,16 @@ public class PaymentServiceImpl implements PaymentService {
         return allPaymentsByUser.stream()
                                 .map(mapper::toDto)
                                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<PaymentResponseDto> getByUserAndOrder(Long userId, UUID orderId) {
+        List<Payment> foundPayments = repository.findAllByUserIdAndOrderId(userId, orderId);
+        logFoundPaymentIds(foundPayments);
+        return foundPayments.stream()
+                            .map(mapper::toDto)
+                            .toList();
     }
 
     private void logFoundPaymentIds(List<Payment> allPaymentsByUser) {

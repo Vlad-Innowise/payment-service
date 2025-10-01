@@ -4,10 +4,13 @@ import by.innowise.internship.payments.model.dto.PaymentRequestDto;
 import by.innowise.internship.payments.model.dto.PaymentResponseDto;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface PaymentService {
 
     PaymentResponseDto create(PaymentRequestDto createDto, Long userId);
 
     List<PaymentResponseDto> getAllByUser(Long userId);
+
+    List<PaymentResponseDto> getByUserAndOrder(Long userId, UUID orderId);
 }

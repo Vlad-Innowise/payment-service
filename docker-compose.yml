@@ -11,6 +11,7 @@ services:
       PAYMENT_SERVICE_GH_REPO_NAME: "${PAYMENT_SERVICE_GH_REPO_NAME}"
       PAYMENT_SERVICE_IMAGE_NAME: "${PAYMENT_SERVICE_IMAGE_NAME}"
       TOKEN_SECRET: "${TOKEN_SECRET}"
+      KAFKA_BOOTSTRAP_URL: "kafka:9092"
       JAVA_TOOL_OPTIONS: '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5008'
     ports:
       - '9015:8080'
@@ -21,6 +22,7 @@ services:
     restart: 'always'
     depends_on:
       - 'payment-service-db'
+      - 'kafka'
 
   payment-service-db:
     image: 'mongo:7.0.24-jammy'
@@ -32,8 +34,35 @@ services:
       - 'mongo-payment-service-vol:/data/db'
     restart: 'always'
 
+  kafka:
+    image: 'confluentinc/cp-kafka:7.9.3'
+    environment:
+      KAFKA_NODE_ID: '1'
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:9093'
+
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      KAFKA_LISTENERS: 'PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,PLAINTEXT_LOCALHOST://0.0.0.0:29092'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:9092,PLAINTEXT_LOCALHOST://localhost:29092'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,PLAINTEXT_LOCALHOST:PLAINTEXT'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+
+      KAFKA_LOG_DIRS: '/var/lib/kafka/data'
+
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: '1'
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: '1'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: '1'
+
+      CLUSTER_ID: "${KAFKA_CLUSTER_ID}"
+
+    ports:
+      - "29092:29092"
+    volumes:
+      - 'kafka-data-vol:/var/lib/kafka/data'
+
 volumes:
   mongo-payment-service-vol:
+  kafka-data-vol:
 
 networks:
   default:

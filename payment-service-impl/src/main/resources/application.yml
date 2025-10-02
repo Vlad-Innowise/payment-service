@@ -10,6 +10,9 @@ spring:
       uri: "${MONGO_DB_URL}"
       uuid-representation: 'standard'
 
+  kafka:
+    bootstrap-servers: "${KAFKA_BOOTSTRAP_URL}"
+
 logging:
   level:
     root: 'info'

@@ -19,6 +19,9 @@ logging:
     by.innowise.internship.payments.feign.RandomIntClient: 'DEBUG'
 
 application:
+  security:
+    enabled: 'true'
+    secretKey: "${TOKEN_SECRET}"
   feign:
     clients:
       random-org:

@@ -6,11 +6,13 @@ import by.innowise.internship.payments.model.dto.PaymentResponseDto;
 import by.innowise.internship.payments.model.dto.PeriodTotalResponse;
 import by.innowise.internship.payments.model.entity.PaymentStatus;
 import by.innowise.internship.payments.service.PaymentService;
+import by.innowise.internship.security.dto.UserHolder;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,7 +26,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/payments/user/{userId}")
+@RequestMapping("/payments")
 @RequiredArgsConstructor
 @Slf4j
 @Validated
@@ -32,9 +34,13 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
-    @PostMapping
-    public ResponseEntity<PaymentResponseDto> createPayment(@PathVariable Long userId,
-                                                            @RequestBody @Valid PaymentRequestDto newPayment) {
+    @PostMapping("/new")
+    public ResponseEntity<PaymentResponseDto> createPayment(@RequestBody
+                                                            @Valid
+                                                            PaymentRequestDto newPayment,
+                                                            @RequestParam
+                                                            @NotNull(message = "User Id can't be null")
+                                                            Long userId) {
         log.info("Requested to process a new payment for user: {}: {}", newPayment, userId);
         PaymentResponseDto created = paymentService.create(newPayment, userId);
         log.info("Payment request was processed. Sending response to the client: {}", created);
@@ -42,7 +48,9 @@ public class PaymentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PaymentResponseDto>> getAllPaymentsByUser(@PathVariable Long userId) {
+    public ResponseEntity<List<PaymentResponseDto>> getAllPaymentsByUser(@AuthenticationPrincipal
+                                                                         UserHolder userHolder) {
+        Long userId = userHolder.crossServiceUserId();
         log.info("Requested to get all payments for user: {}", userId);
         List<PaymentResponseDto> allPayments = paymentService.getAllByUser(userId);
         log.info("Got payment list of size: {}", allPayments.size());
@@ -51,10 +59,11 @@ public class PaymentController {
 
     @GetMapping("/by-order/{orderId}")
     public ResponseEntity<List<PaymentResponseDto>> getByUserAndOrder(@PathVariable
-                                                                      Long userId,
-                                                                      @PathVariable
                                                                       @NotNull(message = "Order id can't be null")
-                                                                      UUID orderId) {
+                                                                      UUID orderId,
+                                                                      @AuthenticationPrincipal
+                                                                      UserHolder userHolder) {
+        Long userId = userHolder.crossServiceUserId();
         log.info("Requested to get all payments for order: {}, user: {}", orderId, userId);
         List<PaymentResponseDto> allPayments = paymentService.getByUserAndOrder(userId, orderId);
         log.info("Got payment list for order: {} of size: {}", orderId, allPayments.size());
@@ -62,9 +71,9 @@ public class PaymentController {
     }
 
     @GetMapping("/by-status")
-    public ResponseEntity<List<PaymentResponseDto>> getByUserAndStatus(@PathVariable Long userId,
-                                                                       @RequestParam
-                                                                       PaymentStatus status) {
+    public ResponseEntity<List<PaymentResponseDto>> getByUserAndStatus(@RequestParam PaymentStatus status,
+                                                                       @AuthenticationPrincipal UserHolder userHolder) {
+        Long userId = userHolder.crossServiceUserId();
         log.info("Requested to get all payments for user: {} by status: {}", userId, status);
         List<PaymentResponseDto> allPaymentsByStatus = paymentService.getAllByUserAndStatus(userId, status);
         log.info("Received all payments: {} with status: {}", allPaymentsByStatus.size(), status);
@@ -72,8 +81,9 @@ public class PaymentController {
     }
 
     @GetMapping("/total-by-period")
-    public ResponseEntity<PeriodTotalResponse> getByUserAndStatus(@PathVariable Long userId,
-                                                                  @RequestBody @Valid PaymentPeriod paymentPeriod) {
+    public ResponseEntity<PeriodTotalResponse> getByUserAndStatus(@RequestBody @Valid PaymentPeriod paymentPeriod,
+                                                                  @AuthenticationPrincipal UserHolder userHolder) {
+        Long userId = userHolder.crossServiceUserId();
         log.info("Requested to calculate total payment amount for finished payment for the period from: {} to: {}",
                  paymentPeriod.from(), paymentPeriod.to());
         return ResponseEntity.ok(paymentService.calculatePaymentTotalForPeriod(userId, paymentPeriod));

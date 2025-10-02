@@ -71,7 +71,7 @@ jobs:
             -Dsonar.organization=vlad-innowise
             -Dsonar.projectKey=Vlad-Innowise_payment-service
             -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.java.binaries=order-service-impl/target/classes
+            -Dsonar.java.binaries=payment-service-impl/target/classes
   docker-image:
     runs-on: ubuntu-latest
     needs: [ sonarqube ]

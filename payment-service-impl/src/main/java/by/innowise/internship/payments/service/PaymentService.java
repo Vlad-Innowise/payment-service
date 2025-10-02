@@ -6,7 +6,6 @@ import by.innowise.internship.payments.model.dto.PaymentResponseDto;
 import by.innowise.internship.payments.model.dto.PeriodTotalResponse;
 import by.innowise.internship.payments.model.entity.PaymentStatus;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 

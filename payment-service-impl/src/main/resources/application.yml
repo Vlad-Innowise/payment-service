@@ -18,6 +18,21 @@ logging:
     root: 'info'
     by.innowise.internship.payments.feign.RandomIntClient: 'DEBUG'
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: 'health,info'
+  endpoint:
+    health:
+      probes:
+        enabled: 'true'
+  health:
+    livenessState:
+      enabled: 'true'
+    readinessState:
+      enabled: 'true'
+
 application:
   security:
     enabled: 'true'

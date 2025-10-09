@@ -8,3 +8,36 @@ spring:
   data:
     mongodb:
       uri: "${MONGO_DB_URL}"
+      uuid-representation: 'standard'
+
+  kafka:
+    bootstrap-servers: "${KAFKA_BOOTSTRAP_URL}"
+
+logging:
+  level:
+    root: 'info'
+    by.innowise.internship.payments.feign.RandomIntClient: 'DEBUG'
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: 'health,info'
+  endpoint:
+    health:
+      probes:
+        enabled: 'true'
+  health:
+    livenessState:
+      enabled: 'true'
+    readinessState:
+      enabled: 'true'
+
+application:
+  security:
+    enabled: 'true'
+    secretKey: "${TOKEN_SECRET}"
+  feign:
+    clients:
+      random-org:
+        url: "https://www.random.org/integers/"

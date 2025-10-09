@@ -5,7 +5,7 @@ import by.innowise.internship.payments.model.dto.PaymentRequestDto;
 import by.innowise.internship.payments.model.dto.PaymentResponseDto;
 import by.innowise.internship.payments.model.dto.PeriodTotalResponse;
 import by.innowise.internship.payments.model.entity.PaymentStatus;
-import by.innowise.internship.payments.service.PaymentService;
+import by.innowise.internship.payments.service.facade.PaymentFacade;
 import by.innowise.internship.security.dto.UserHolder;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -32,17 +32,14 @@ import java.util.UUID;
 @Validated
 public class PaymentController {
 
-    private final PaymentService paymentService;
+    private final PaymentFacade paymentFacade;
 
     @PostMapping("/new")
-    public ResponseEntity<PaymentResponseDto> createPayment(@RequestBody
-                                                            @Valid
-                                                            PaymentRequestDto newPayment,
-                                                            @RequestParam
-                                                            @NotNull(message = "User Id can't be null")
-                                                            Long userId) {
-        log.info("Requested to process a new payment for user: {}: {}", newPayment, userId);
-        PaymentResponseDto created = paymentService.create(newPayment, userId);
+    public ResponseEntity<PaymentResponseDto> createPayment(@RequestBody @Valid PaymentRequestDto newPayment,
+                                                            @AuthenticationPrincipal UserHolder userHolder) {
+        Long userId = userHolder.crossServiceUserId();
+        log.info("Requested to process a new payment {}: for user: {}", newPayment, userId);
+        PaymentResponseDto created = paymentFacade.create(newPayment, userId);
         log.info("Payment request was processed. Sending response to the client: {}", created);
         return ResponseEntity.ok(created);
     }
@@ -52,7 +49,7 @@ public class PaymentController {
                                                                          UserHolder userHolder) {
         Long userId = userHolder.crossServiceUserId();
         log.info("Requested to get all payments for user: {}", userId);
-        List<PaymentResponseDto> allPayments = paymentService.getAllByUser(userId);
+        List<PaymentResponseDto> allPayments = paymentFacade.getAllByUser(userId);
         log.info("Got payment list of size: {}", allPayments.size());
         return ResponseEntity.ok(allPayments);
     }
@@ -65,7 +62,7 @@ public class PaymentController {
                                                                       UserHolder userHolder) {
         Long userId = userHolder.crossServiceUserId();
         log.info("Requested to get all payments for order: {}, user: {}", orderId, userId);
-        List<PaymentResponseDto> allPayments = paymentService.getByUserAndOrder(userId, orderId);
+        List<PaymentResponseDto> allPayments = paymentFacade.getByUserAndOrder(userId, orderId);
         log.info("Got payment list for order: {} of size: {}", orderId, allPayments.size());
         return ResponseEntity.ok(allPayments);
     }
@@ -75,7 +72,7 @@ public class PaymentController {
                                                                        @AuthenticationPrincipal UserHolder userHolder) {
         Long userId = userHolder.crossServiceUserId();
         log.info("Requested to get all payments for user: {} by status: {}", userId, status);
-        List<PaymentResponseDto> allPaymentsByStatus = paymentService.getAllByUserAndStatus(userId, status);
+        List<PaymentResponseDto> allPaymentsByStatus = paymentFacade.getAllByUserAndStatus(userId, status);
         log.info("Received all payments: {} with status: {}", allPaymentsByStatus.size(), status);
         return ResponseEntity.ok(allPaymentsByStatus);
     }
@@ -86,6 +83,6 @@ public class PaymentController {
         Long userId = userHolder.crossServiceUserId();
         log.info("Requested to calculate total payment amount for finished payment for the period from: {} to: {}",
                  paymentPeriod.from(), paymentPeriod.to());
-        return ResponseEntity.ok(paymentService.calculatePaymentTotalForPeriod(userId, paymentPeriod));
+        return ResponseEntity.ok(paymentFacade.calculatePaymentTotalForPeriod(userId, paymentPeriod));
     }
 }

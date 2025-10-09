@@ -20,7 +20,6 @@ import java.util.List;
 public class SecurityConfig {
 
     private static final List<String> WHITELIST_PATHS = List.of(
-            "/payments/new",
             "/actuator/health", "/actuator/health/**");
 
     @Bean

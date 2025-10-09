@@ -12,6 +12,7 @@ import by.innowise.internship.payments.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,6 +25,7 @@ public class PaymentFacadeImpl implements PaymentFacade {
     private final PaymentService paymentService;
     private final PaymentPublisher paymentPublisher;
 
+    @Transactional
     @Override
     public PaymentResponseDto create(PaymentRequestDto createDto, Long userId) {
         PaymentResponseDto responseDto = paymentService.create(createDto, userId);

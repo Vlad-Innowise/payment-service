@@ -17,6 +17,9 @@ logging:
   level:
     root: 'info'
     by.innowise.internship.payments.feign.RandomIntClient: 'DEBUG'
+    org.springframework.kafka.listener.DeadLetterPublishingRecoverer: 'DEBUG'
+    org.springframework.kafka.listener.DefaultErrorHandler: 'DEBUG'
+    org.apache.kafka.clients.producer: 'DEBUG'
 
 management:
   endpoints:

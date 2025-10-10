@@ -40,6 +40,7 @@ public class OrderListener {
             ack.acknowledge();
         } catch (Exception e) {
             log.error("Failed to process order-created-event: {}", event, e);
+            throw e;
         }
     }
 

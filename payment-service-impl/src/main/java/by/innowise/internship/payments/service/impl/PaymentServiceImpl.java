@@ -1,5 +1,6 @@
 package by.innowise.internship.payments.service.impl;
 
+import by.innowise.internship.payments.exception.PaymentNotFoundException;
 import by.innowise.internship.payments.mapper.PaymentMapper;
 import by.innowise.internship.payments.model.dto.PaymentPeriod;
 import by.innowise.internship.payments.model.dto.PaymentRequestDto;
@@ -14,6 +15,7 @@ import by.innowise.internship.payments.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +47,19 @@ public class PaymentServiceImpl implements PaymentService {
         Payment saved = repository.save(toSave);
         log.info("Pre-saved entity to repository: {}", saved);
         return mapper.toDto(saved);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public PaymentResponseDto getByUserAndPaymentId(Long userId, ObjectId paymentId) {
+        return repository.findByIdAndUserId(paymentId, userId)
+                         .map(payment -> {
+                             log.info("Found payment by id: {}", payment);
+                             return mapper.toDto(payment);
+                         })
+                         .orElseThrow(() -> new PaymentNotFoundException(
+                                 "Payment: {%s} for user: {%s} doesn't exist".formatted(paymentId, userId),
+                                 HttpStatus.NOT_FOUND));
     }
 
     @Transactional(readOnly = true)

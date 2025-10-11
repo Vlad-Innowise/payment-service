@@ -5,6 +5,7 @@ import by.innowise.internship.payments.model.dto.PaymentRequestDto;
 import by.innowise.internship.payments.model.dto.PaymentResponseDto;
 import by.innowise.internship.payments.model.dto.PeriodTotalResponse;
 import by.innowise.internship.payments.model.entity.PaymentStatus;
+import org.bson.types.ObjectId;
 
 import java.util.List;
 import java.util.UUID;
@@ -12,6 +13,8 @@ import java.util.UUID;
 public interface PaymentFacade {
 
     PaymentResponseDto create(PaymentRequestDto createDto, Long userId);
+
+    PaymentResponseDto getByUserAndPaymentId(Long userId, ObjectId paymentId);
 
     List<PaymentResponseDto> getAllByUser(Long userId);
 

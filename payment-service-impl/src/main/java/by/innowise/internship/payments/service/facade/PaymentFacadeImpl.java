@@ -11,6 +11,7 @@ import by.innowise.internship.payments.model.entity.PaymentStatus;
 import by.innowise.internship.payments.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +38,11 @@ public class PaymentFacadeImpl implements PaymentFacade {
         log.info("Mapped response dto to payment event: {}", paymentEvent);
         paymentPublisher.publishPaymentCreated(paymentEvent);
         return responseDto;
+    }
+
+    @Override
+    public PaymentResponseDto getByUserAndPaymentId(Long userId, ObjectId paymentId) {
+        return paymentService.getByUserAndPaymentId(userId, paymentId);
     }
 
     @Override

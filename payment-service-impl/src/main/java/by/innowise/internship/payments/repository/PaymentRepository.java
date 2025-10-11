@@ -18,6 +18,8 @@ public interface PaymentRepository extends MongoRepository<Payment, ObjectId> {
 
     List<Payment> findAllByUserId(Long userId);
 
+    Optional<Payment> findByIdAndUserId(ObjectId id, Long userId);
+
     List<Payment> findAllByUserIdAndStatus(Long userId, PaymentStatus status);
 
     @Aggregation(pipeline = {

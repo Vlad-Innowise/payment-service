@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -42,6 +43,16 @@ public class PaymentController {
         PaymentResponseDto created = paymentFacade.create(newPayment, userId);
         log.info("Payment request was processed. Sending response to the client: {}", created);
         return ResponseEntity.ok(created);
+    }
+
+    @GetMapping("/{paymentId}")
+    public ResponseEntity<PaymentResponseDto> getPaymentsById(@PathVariable ObjectId paymentId,
+                                                              @AuthenticationPrincipal UserHolder userHolder) {
+        Long userId = userHolder.crossServiceUserId();
+        log.info("User: [{}] initiated request to get payment by id: [{}]", userId, paymentId);
+        PaymentResponseDto paymentResponse = paymentFacade.getByUserAndPaymentId(userId, paymentId);
+        log.info("Payment response received and sending to a client: {}", paymentResponse);
+        return ResponseEntity.ok(paymentResponse);
     }
 
     @GetMapping

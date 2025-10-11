@@ -21,6 +21,16 @@ logging:
     org.springframework.kafka.listener.DefaultErrorHandler: 'DEBUG'
     org.apache.kafka.clients.producer: 'DEBUG'
 
+resilience4j:
+  retry:
+    instances:
+      randomIntServiceRetry:
+        max-attempts: 3
+        wait-duration: '1s'
+        retry-exceptions:
+          - 'feign.FeignException'
+          - 'by.innowise.common.library.exception.ApplicationException'
+
 management:
   endpoints:
     web:

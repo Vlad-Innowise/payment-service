@@ -11,6 +11,8 @@ public class RandomOrgProperty {
     private static final String INTEGER_FORMAT_PLAIN = "plain";
     private static final String RANDOM_GEN_TYPE = "new";
 
+    private String url;
+
     private int num = 1;
 
     private int min = 1;
